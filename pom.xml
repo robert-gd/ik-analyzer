@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wltea.ik-analyzer</groupId>
     <artifactId>ik-analyzer</artifactId>
-    <version>9.0.0</version>
+    <version>9.0.0-SNAPSHOT</version>
     <name>IK Analyzer</name>
     <description>A dictionary and grammar-based Chinese segmenter.</description>
     <properties>
@@ -105,4 +105,29 @@
             </plugin>
         </plugins>
     </build>
+
+    <!--    <distributionManagement>-->
+    <!--        <repository>-->
+    <!--            <id>rdc2-snapshots</id>-->
+    <!--            <name>saas snapshots</name>-->
+    <!--            <url>https://packages.aliyun.com/maven/repository/2149257-snapshot-cGW8bg/</url>-->
+    <!--        </repository>-->
+    <!--        <snapshotRepository>-->
+    <!--            <id>rdc2-releases</id>-->
+    <!--            <name>saas release</name>-->
+    <!--            <url>:https://packages.aliyun.com/maven/repository/2149257-release-JLNqiL/</url>-->
+    <!--        </snapshotRepository>-->
+    <!--    </distributionManagement>-->
+    <distributionManagement>
+        <repository>
+            <id>rdc2-releases</id>
+            <name>saas release</name>
+            <url>:https://packages.aliyun.com/maven/repository/2149257-release-JLNqiL/</url>
+        </repository>
+        <snapshotRepository>
+            <id>rdc2-snapshots</id>
+            <name>saas snapshots</name>
+            <url>https://packages.aliyun.com/maven/repository/2149257-snapshot-cGW8bg/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

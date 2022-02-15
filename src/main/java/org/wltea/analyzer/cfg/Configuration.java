@@ -53,6 +53,8 @@ public interface Configuration {
      */
     String getMainDictionary();
 
+    Class getDictionary();
+
     /**
      * 获取量词词典路径
      *

@@ -25,6 +25,10 @@ package org.wltea.analyzer.sample;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -49,7 +53,7 @@ public class IKAnalzyerTest {
         TokenStream ts = null;
         try {
             ts = analyzer.tokenStream("myfield",
-                    new StringReader("这是一个中文分词的例子，你可以直接运行它！IKAnalyer can analysis english text too"));
+                    new StringReader("过来一下，这是一个中文分词的例子，你可以直接运行它！IKAnalyer can analysis english text too"));
             //获取词元位置属性
             OffsetAttribute offset = ts.addAttribute(OffsetAttribute.class);
             //获取词元文本属性

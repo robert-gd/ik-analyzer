@@ -25,6 +25,7 @@ package org.wltea.analyzer.cfg;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wltea.analyzer.dic.Dictionary;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,6 +79,11 @@ public class DefaultConfig implements Configuration {
                 LOG.error("", e);
             }
         }
+    }
+
+    @Override
+    public Class getDictionary() {
+        return Dictionary.class;
     }
 
     /**

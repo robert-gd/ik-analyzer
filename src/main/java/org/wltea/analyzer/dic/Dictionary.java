@@ -27,8 +27,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +47,7 @@ public class Dictionary {
     /**
      * 词典单子实例
      */
-    private static Dictionary singleton;
+    protected static Dictionary singleton;
 
     /**
      * 主词典对象
@@ -65,11 +68,19 @@ public class Dictionary {
      */
     private Configuration cfg;
 
-    private Dictionary(Configuration cfg) {
+    public Dictionary(Configuration cfg) {
         this.cfg = cfg;
         this.loadMainDict();
         this.loadStopWordDict();
         this.loadQuantifierDict();
+    }
+
+    /**
+     * 这部分外部词库，用于子类子去实现，
+     * 停词词库需要去除这部分词，这部分词需要出现在分词结果里面
+     */
+    protected Set<String> getExtDictWords() {
+        return Collections.EMPTY_SET;
     }
 
     /**
@@ -82,15 +93,22 @@ public class Dictionary {
      * @return Dictionary
      */
     public static Dictionary initial(Configuration cfg) {
-        if (singleton == null) {
-            synchronized(Dictionary.class) {
-                if (singleton == null) {
-                    singleton = new Dictionary(cfg);
-                    return singleton;
+        try {
+            Class<Dictionary> clz = cfg.getDictionary();
+            Constructor<Dictionary> constructor = clz.getConstructor(Configuration.class);
+            if (singleton == null) {
+                synchronized (Dictionary.class) {
+                    if (singleton == null) {
+                        singleton = constructor.newInstance(cfg);
+                        return singleton;
+                    }
                 }
             }
+            return singleton;
+        } catch (Exception e) {
+            throw new IllegalStateException("词典创建失败", e);
         }
-        return singleton;
+
     }
 
     /**
@@ -141,7 +159,6 @@ public class Dictionary {
      * 检索匹配主词典
      *
      * @param charArray
-     *
      * @return Hit 匹配结果描述
      */
     public Hit matchInMainDict(char[] charArray) {
@@ -154,7 +171,6 @@ public class Dictionary {
      * @param charArray
      * @param begin
      * @param length
-     *
      * @return Hit 匹配结果描述
      */
     public Hit matchInMainDict(char[] charArray, int begin, int length) {
@@ -167,7 +183,6 @@ public class Dictionary {
      * @param charArray
      * @param begin
      * @param length
-     *
      * @return Hit 匹配结果描述
      */
     public Hit matchInQuantifierDict(char[] charArray, int begin, int length) {
@@ -180,7 +195,6 @@ public class Dictionary {
      * @param charArray
      * @param currentIndex
      * @param matchedHit
-     *
      * @return Hit
      */
     public Hit matchWithHit(char[] charArray, int currentIndex, Hit matchedHit) {
@@ -194,7 +208,6 @@ public class Dictionary {
      * @param charArray
      * @param begin
      * @param length
-     *
      * @return boolean
      */
     public boolean isStopWord(char[] charArray, int begin, int length) {
@@ -236,6 +249,24 @@ public class Dictionary {
         }
         //加载扩展词典
         this.loadExtDict();
+        this.loadExtDictWords();
+    }
+
+    /**
+     * 加载扩展的词库，以内存词库的方式加载，loadExtDict是已文件形式的方式加载
+     */
+    private void loadExtDictWords() {
+        Set<String> extWords = getExtDictWords();
+        if (null == extWords || extWords.size() == 0) {
+            return;
+        }
+
+        extWords.forEach(theWord -> {
+            if (theWord != null && !"".equals(theWord.trim())) {
+                //加载扩展词典数据到主内存词典中
+                mainDict.fillSegment(theWord.trim().toLowerCase().toCharArray());
+            }
+        });
     }
 
     /**
@@ -288,6 +319,7 @@ public class Dictionary {
         stopWordDict = new DictSegment((char) 0);
         //加载扩展停止词典
         List<String> extStopWordDictFiles = cfg.getExtStopWordDictionarys();
+        Set<String> extDictWords = getExtDictWords();
         if (extStopWordDictFiles != null) {
             InputStream is = null;
             for (String extStopWordDictName : extStopWordDictFiles) {
@@ -305,7 +337,9 @@ public class Dictionary {
                         theWord = br.readLine();
                         if (theWord != null && !"".equals(theWord.trim())) {
                             //加载扩展停止词典数据到内存中
-                            stopWordDict.fillSegment(theWord.trim().toLowerCase().toCharArray());
+                            if (null == extDictWords || !extDictWords.contains(theWord)) {
+                                stopWordDict.fillSegment(theWord.trim().toLowerCase().toCharArray());
+                            }
                         }
                     } while (theWord != null);
 
