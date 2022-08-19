@@ -29,10 +29,7 @@ import org.wltea.analyzer.dic.Dictionary;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.InvalidPropertiesFormatException;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Configuration 默认实现
@@ -82,8 +79,8 @@ public class DefaultConfig implements Configuration {
     }
 
     @Override
-    public Class getDictionary() {
-        return Dictionary.class;
+    public Dictionary getDictionary() {
+        return new Dictionary(this);
     }
 
     /**

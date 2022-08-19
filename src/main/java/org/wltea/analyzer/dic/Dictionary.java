@@ -63,6 +63,8 @@ public class Dictionary {
      */
     private DictSegment quantifierDict;
 
+    private Set<String> extDictWords;
+
     /**
      * 配置对象
      */
@@ -75,12 +77,24 @@ public class Dictionary {
         this.loadQuantifierDict();
     }
 
+    public Dictionary(Configuration cfg, Set<String> extDictWords) {
+        this.cfg = cfg;
+        this.extDictWords = extDictWords;
+        this.loadMainDict();
+        this.loadStopWordDict();
+        this.loadQuantifierDict();
+    }
+
     /**
      * 这部分外部词库，用于子类子去实现，
      * 停词词库需要去除这部分词，这部分词需要出现在分词结果里面
      */
     protected Set<String> getExtDictWords() {
-        return Collections.EMPTY_SET;
+        return extDictWords;
+    }
+
+    public void SetExtDictWords(Set<String> words) {
+        extDictWords = words;
     }
 
     /**
@@ -94,12 +108,10 @@ public class Dictionary {
      */
     public static Dictionary initial(Configuration cfg) {
         try {
-            Class<Dictionary> clz = cfg.getDictionary();
-            Constructor<Dictionary> constructor = clz.getConstructor(Configuration.class);
             if (singleton == null) {
                 synchronized (Dictionary.class) {
                     if (singleton == null) {
-                        singleton = constructor.newInstance(cfg);
+                        singleton = cfg.getDictionary();
                         return singleton;
                     }
                 }

@@ -23,6 +23,8 @@
  */
 package org.wltea.analyzer.cfg;
 
+import org.wltea.analyzer.dic.Dictionary;
+
 import java.util.List;
 
 /**
@@ -53,7 +55,7 @@ public interface Configuration {
      */
     String getMainDictionary();
 
-    Class getDictionary();
+    Dictionary getDictionary();
 
     /**
      * 获取量词词典路径
